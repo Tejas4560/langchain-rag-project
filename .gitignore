@@ -9,7 +9,8 @@ frontend/build/
 
 # Secrets
 .env
-*.json
+# *.json <- Removed to allow package.json
+github-sa-key.json
 
 # Vector DB
 vectorstore/
