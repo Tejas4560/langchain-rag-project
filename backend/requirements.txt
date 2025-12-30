@@ -1,0 +1,36 @@
+# Core
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-dotenv==1.0.0
+pydantic==2.5.3
+
+# LangChain (STABLE 0.1.x STACK)
+langchain==0.1.6
+langchain-core==0.1.23
+langchain-community==0.0.19
+langsmith==0.0.87
+langchain-groq==0.0.1
+
+# Vector Store & Embeddings
+faiss-cpu==1.9.0.post1
+sentence-transformers==2.6.1
+
+# Document Processing
+pypdf==4.0.1
+
+# Tokenization
+tiktoken==0.5.2
+
+# HTTP
+httpx==0.26.0
+fastapi-sso==0.10.0
+
+# Auth & DB
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+sqlalchemy==2.0.25
+python-multipart==0.0.6
+
+# Production
+gunicorn==21.2.0

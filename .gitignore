@@ -1,0 +1,25 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+frontend/build/
+
+# Secrets
+.env
+*.json
+
+# Vector DB
+vectorstore/
+data/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+
+# Kubernetes Secrets
+k8s/secret.yaml

@@ -1,0 +1,91 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
+  SERVICE_BACKEND: rag-backend
+  SERVICE_FRONTEND: rag-frontend
+  IMAGE_BACKEND: gcr.io/${{ secrets.GCP_PROJECT_ID }}/rag-backend
+  IMAGE_FRONTEND: gcr.io/${{ secrets.GCP_PROJECT_ID }}/rag-frontend
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Setup gcloud CLI
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+
+    - run: |-
+        gcloud --quiet auth configure-docker
+
+    # Build & Push Backend
+    - name: Build Backend
+      run: |-
+        docker build \
+          --tag "$IMAGE_BACKEND:$GITHUB_SHA" \
+          --tag "$IMAGE_BACKEND:latest" \
+          ./backend
+        docker push "$IMAGE_BACKEND:$GITHUB_SHA"
+        docker push "$IMAGE_BACKEND:latest"
+
+    # Build & Push Frontend (npm install first)
+    - name: Build Frontend
+      run: |-
+        cd frontend
+        npm install
+        npm run build
+        docker build \
+          --tag "$IMAGE_FRONTEND:$GITHUB_SHA" \
+          --tag "$IMAGE_FRONTEND:latest" \
+          .
+        docker push "$IMAGE_FRONTEND:$GITHUB_SHA"
+        docker push "$IMAGE_FRONTEND:latest"
+
+    # Deploy Backend to Cloud Run
+    - name: Deploy Backend to Cloud Run
+      id: deploy-backend
+      uses: google-github-actions/deploy-cloudrun@v1
+      with:
+        service: ${{ env.SERVICE_BACKEND }}
+        image: ${{ env.IMAGE_BACKEND }}:${{ github.sha }}
+        region: ${{ env.REGION }}
+        env_vars: |
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GROQ_MODEL=llama3-8b-8192
+        flags: '--allow-unauthenticated --memory=1Gi'
+
+    # Deploy Frontend to Cloud Run
+    - name: Deploy Frontend to Cloud Run
+      id: deploy-frontend
+      uses: google-github-actions/deploy-cloudrun@v1
+      with:
+        service: ${{ env.SERVICE_FRONTEND }}
+        image: ${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
+        region: ${{ env.REGION }}
+        env_vars: |
+          BACKEND_URL=${{ steps.deploy-backend.outputs.url }}
+        flags: '--allow-unauthenticated'
+
+    - name: Show Output
+      run: |-
+        echo "Backend URL: ${{ steps.deploy-backend.outputs.url }}"
+        echo "Frontend URL: ${{ steps.deploy-frontend.outputs.url }}"
