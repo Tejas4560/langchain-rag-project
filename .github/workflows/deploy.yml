@@ -103,7 +103,9 @@ jobs:
       - name: Setup Environment
         run: |-
           CLEAN_PROJECT_ID=$(echo "${{ secrets.GCP_PROJECT_ID }}" | tr -d '\n' | tr -d '\r')
+          CLEAN_REGION=$(echo "${{ secrets.GCP_REGION }}" | tr -d '\n' | tr -d '\r')
           echo "PROJECT_ID=$CLEAN_PROJECT_ID" >> $GITHUB_ENV
+          echo "REGION=$CLEAN_REGION" >> $GITHUB_ENV
           echo "IMAGE_BACKEND=gcr.io/$CLEAN_PROJECT_ID/rag-backend" >> $GITHUB_ENV
           echo "IMAGE_FRONTEND=gcr.io/$CLEAN_PROJECT_ID/rag-frontend" >> $GITHUB_ENV
 
