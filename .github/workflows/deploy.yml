@@ -146,12 +146,10 @@ jobs:
       # Update Backend (With Self URL and Frontend URL)
       - name: Configure Backend URLs
         run: |-
-          TIMESTAMP=$(date +%s)
-          # We add "|| true" to ignore errors if no config change is detected
-          gcloud run services update ${{ env.SERVICE_BACKEND }} \
+          gcloud run deploy ${{ env.SERVICE_BACKEND }} \
+            --image ${{ env.IMAGE_BACKEND }}:${{ github.sha }} \
             --region ${{ env.REGION }} \
-            --update-env-vars BASE_URL=${{ steps.deploy-backend.outputs.url }},FRONTEND_URL=${{ steps.deploy-frontend.outputs.url }} \
-            --update-labels pipeline-run-id=$TIMESTAMP || true
+            --update-env-vars BASE_URL=${{ steps.deploy-backend.outputs.url }},FRONTEND_URL=${{ steps.deploy-frontend.outputs.url }}
 
       - name: Show Output
         run: |-
