@@ -6,12 +6,9 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
   SERVICE_BACKEND: rag-backend
   SERVICE_FRONTEND: rag-frontend
-  IMAGE_BACKEND: gcr.io/${{ secrets.GCP_PROJECT_ID }}/rag-backend
-  IMAGE_FRONTEND: gcr.io/${{ secrets.GCP_PROJECT_ID }}/rag-frontend
 
 jobs:
   deploy:
@@ -21,6 +18,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Setup Environment
+      run: |-
+        CLEAN_PROJECT_ID=$(echo "${{ secrets.GCP_PROJECT_ID }}" | tr -d '\n' | tr -d '\r')
+        echo "PROJECT_ID=$CLEAN_PROJECT_ID" >> $GITHUB_ENV
+        echo "IMAGE_BACKEND=gcr.io/$CLEAN_PROJECT_ID/rag-backend" >> $GITHUB_ENV
+        echo "IMAGE_FRONTEND=gcr.io/$CLEAN_PROJECT_ID/rag-frontend" >> $GITHUB_ENV
 
     # Setup gcloud CLI
     - id: 'auth'
