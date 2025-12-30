@@ -53,7 +53,10 @@ app.add_middleware(
 # Google SSO
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-google_sso = GoogleSSO(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, f"http://localhost:8000/auth/google/callback")
+
+# Use BASE_URL environment variable if set, otherwise default to localhost for dev
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
+google_sso = GoogleSSO(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, f"{BASE_URL}/auth/google/callback")
 
 
 # Base paths
@@ -203,7 +206,8 @@ async def google_callback(request: Request, db: Session = Depends(auth.get_db)):
     
     # Redirect to frontend with token
     # Adjust valid frontend URL as needed
-    frontend_url = f"http://localhost:3000/auth/callback?token={access_token}&username={db_user.username}"
+    frontend_base_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    frontend_url = f"{frontend_base_url}/auth/callback?token={access_token}&username={db_user.username}"
     from fastapi.responses import RedirectResponse
     return RedirectResponse(url=frontend_url)
 @app.post("/ask")
