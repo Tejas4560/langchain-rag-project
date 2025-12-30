@@ -136,7 +136,8 @@ jobs:
         run: |-
           gcloud run services update ${{ env.SERVICE_BACKEND }} \
             --region ${{ env.REGION }} \
-            --update-env-vars BASE_URL=${{ steps.deploy-backend.outputs.url }},FRONTEND_URL=${{ steps.deploy-frontend.outputs.url }}
+            --update-env-vars BASE_URL=${{ steps.deploy-backend.outputs.url }},FRONTEND_URL=${{ steps.deploy-frontend.outputs.url }} \
+            --update-labels pipeline-run-id=${{ github.run_id }}
 
       - name: Show Output
         run: |-
