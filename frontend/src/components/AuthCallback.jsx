@@ -7,18 +7,59 @@ const AuthCallback = () => {
     const { loginWithToken } = useAuth();
     const navigate = useNavigate();
 
+    const [error, setError] = React.useState(null);
+
     useEffect(() => {
         const token = searchParams.get('token');
-        const username = searchParams.get('username');
+        const username = searchParams.get('username') || 'User'; // Fallback username if missing
 
-        if (token && username) {
-            loginWithToken(token, username);
-            navigate('/');
+        if (token) {
+            try {
+                loginWithToken(token, username);
+                navigate('/');
+            } catch (err) {
+                console.error("Login failed:", err);
+                setError("Failed to process login token.");
+            }
         } else {
-            console.error('Missing token or username in callback URL');
-            navigate('/login');
+            console.error('Missing token or username in callback URL:', window.location.href);
+            setError("Authentication failed. No token received from server.");
+            // Do not immediately redirect, let user see the error
         }
     }, [searchParams, loginWithToken, navigate]);
+
+    if (error) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                backgroundColor: '#f3f4f6',
+                color: '#ef4444'
+            }}>
+                <div style={{ padding: '2rem', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+                    <h2 style={{ marginBottom: '1rem' }}>Login Error</h2>
+                    <p>{error}</p>
+                    <button
+                        onClick={() => navigate('/login')}
+                        style={{
+                            marginTop: '1.5rem',
+                            padding: '0.75rem 1.5rem',
+                            backgroundColor: '#3b82f6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Return to Login
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
