@@ -100,7 +100,7 @@ const Login = () => {
                         </div>
 
                         <a
-                            href="http://localhost:8000/auth/google/login"
+                            href="/api/auth/google/login"
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
