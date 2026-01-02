@@ -206,7 +206,12 @@ async def google_callback(request: Request, db: Session = Depends(auth.get_db)):
     
     # Redirect to frontend with token
     # Adjust valid frontend URL as needed
-    frontend_base_url = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+    frontend_base_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    # Aggressive sanitation: remove trailing slash and specific paths like /login
+    frontend_base_url = frontend_base_url.rstrip("/")
+    if frontend_base_url.endswith("/login"):
+        frontend_base_url = frontend_base_url[:-6] # Remove /login
+    
     frontend_url = f"{frontend_base_url}/auth/callback?token={access_token}&username={db_user.username}"
     from fastapi.responses import RedirectResponse
     return RedirectResponse(url=frontend_url)
