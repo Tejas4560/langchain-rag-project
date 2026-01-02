@@ -17,6 +17,7 @@ sentence-transformers==2.6.1
 
 # Document Processing
 pypdf==4.0.1
+langchain-text-splitters
 
 # Tokenization
 tiktoken==0.5.2
