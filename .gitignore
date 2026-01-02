@@ -24,3 +24,6 @@ data/
 
 # Kubernetes Secrets
 k8s/secret.yaml
+
+*.db
+url_test.py
