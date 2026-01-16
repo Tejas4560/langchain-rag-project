@@ -4,7 +4,7 @@
 # Make sure to update the variables below before running
 
 # Configuration - UPDATE THESE VALUES
-PROJECT_ID="your-gcp-project-id"
+PROJECT_ID="dev-trail-482409-b1"
 CLUSTER_NAME="rag-cluster"
 REGION="us-central1"
 DOMAIN="your-domain.com"  # Optional
